@@ -15,7 +15,7 @@ extern int ESCDELAY;
 
 volatile sig_atomic_t stop_flag = 0;
 
-// Obsługa sygnału przerwania (Ctrl+C)
+// obsluga sygnalow
 void handle_signal(int sig) {
     stop_flag = 1;
 }
@@ -39,12 +39,12 @@ int main(int argc, char *argv[]) {
     init_ui();
     ESCDELAY = 25;
 
-    // Główna pętla aplikacji (Menu -> Gra -> Menu)
+    // main loop
     while (!stop_flag) {
         int menu_choice = show_start_menu();
         if (menu_choice == -1) {
             stop_flag = 1;
-            break; // Wyjście z programu
+            break; //wyjscie
         }
 
         if (menu_choice == 2) {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
         timeout(100);
 
-        // Pętla rozgrywki
+        // game loop
         while (!game.game_over && !stop_flag && !back_to_menu) {
             check_win_condition(&game);
             draw_game_screen(&game, cursor, selected, is_selected);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 
             int ch = getch();
 
-            // Obsługa 'q' jako pauzy
+            // obsluga q
             if (ch == 'q') {
                 game.paused = true;
                 int pause_choice = show_pause_menu();
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
                 timeout(100);
 
-                if (pause_choice == 1) { // Wyjście do menu
+                if (pause_choice == 1) {
                     back_to_menu = true;
                     break;
                 }
@@ -126,7 +126,6 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // Po zakończeniu gry (jeśli nie przerwano sygnałem ani powrotem do menu)
         if (!stop_flag && !back_to_menu) {
             print_final_stats(&game);
         }

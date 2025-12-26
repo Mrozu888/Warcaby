@@ -1,9 +1,8 @@
 #include "game_logic.h"
 #include <stdlib.h>
 #include <math.h>
-#include <stdio.h>
 
-// Deklaracje funkcji pomocniczych
+
 bool can_pawn_capture(GameState *game, Position pos);
 bool can_king_capture(GameState *game, Position pos);
 bool can_piece_capture(GameState *game, Position pos);
@@ -96,9 +95,9 @@ bool can_king_capture(GameState *game, Position pos) {
             if (p == EMPTY) {
                 if (found_enemy) return true; // Puste pole za wrogiem = bicie możliwe
             } else if (is_own(game, p)) {
-                break; // Własny pionek blokuje
+                break;
             } else if (is_enemy(game, p)) {
-                if (found_enemy) break; // Drugi wróg z rzędu - nie można bić
+                if (found_enemy) break;
                 found_enemy = true;
             }
             x += dx;
@@ -115,7 +114,6 @@ bool can_piece_capture(GameState *game, Position pos) {
     return false;
 }
 
-// Sprawdza czy gracz ma jakiekolwiek bicie na planszy
 bool player_has_capture(GameState *game) {
     for (int y = 0; y < BOARD_SIZE; y++) {
         for (int x = 0; x < BOARD_SIZE; x++) {
@@ -129,18 +127,16 @@ bool player_has_capture(GameState *game) {
 }
 
 bool attempt_move(GameState *game, Position from, Position to) {
-    // 1. Walidacja granic planszy (Kluczowa poprawka!)
     if (!is_valid_pos(from) || !is_valid_pos(to)) return false;
 
     PieceType p = game->board[from.y][from.x];
     if (!is_own(game, p)) return false;
 
-    // Jeśli trwa seria bić, można ruszyć tylko tym pionkiem
     if (game->is_chain_capture) {
         if (from.x != game->chain_piece_pos.x || from.y != game->chain_piece_pos.y) return false;
     }
 
-    // Jeśli jest możliwe bicie, trzeba bić
+    // trzeba bic
     bool capture_available = player_has_capture(game);
 
     int dx = to.x - from.x;
@@ -157,10 +153,10 @@ bool attempt_move(GameState *game, Position from, Position to) {
 
     // Logika dla PIONKA
     if (p == WHITE_PIECE || p == BLACK_PIECE) {
-        // Zwykły ruch
+
         if (adx == 1) {
             if (capture_available) return false; // Wymuszenie bicia
-            // Kierunek ruchu (tylko do przodu)
+            // tylko do przodu
             if (p == WHITE_PIECE && dy > 0) return false;
             if (p == BLACK_PIECE && dy < 0) return false;
 
@@ -180,15 +176,15 @@ bool attempt_move(GameState *game, Position from, Position to) {
             captured_pos.x = midX;
             captured_pos.y = midY;
 
-            // Wykonanie ruchu
+            // ruch
             game->board[to.y][to.x] = p;
             game->board[from.y][from.x] = EMPTY;
             game->board[midY][midX] = EMPTY;
         } else {
-            return false; // Pionek nie może ruszyć się o więcej niż 2 pola
+            return false; // pionek nie moze dalej niz 2 pola
         }
     }
-    // Logika dla DAMKI
+    // Logika dla krolowki
     else {
         int stepX = sign(dx);
         int stepY = sign(dy);
@@ -210,13 +206,11 @@ bool attempt_move(GameState *game, Position from, Position to) {
             y += stepY;
         }
 
-        if (enemy_count == 0) {
-            // Zwykły ruch damki
+        if (enemy_count == 0){
             if (capture_available) return false; // Wymuszenie bicia
             game->board[to.y][to.x] = p;
             game->board[from.y][from.x] = EMPTY;
         } else {
-            // Bicie damką
             is_capture = true;
             game->board[to.y][to.x] = p;
             game->board[from.y][from.x] = EMPTY;
@@ -224,12 +218,12 @@ bool attempt_move(GameState *game, Position from, Position to) {
         }
     }
 
-    // Obsługa po ruchu
+
     if (is_capture) {
         if (game->current_turn == PLAYER_WHITE) game->black_pieces--;
         else game->white_pieces--;
 
-        // Promocja
+        // promotion
         bool promoted = false;
         if (p == WHITE_PIECE && to.y == 0) {
             game->board[to.y][to.x] = WHITE_KING;
@@ -240,20 +234,19 @@ bool attempt_move(GameState *game, Position from, Position to) {
             promoted = true;
         }
 
-        // Sprawdź czy możliwe kolejne bicie TYM SAMYM pionkiem
+        // check if bicie
         if (can_piece_capture(game, to)) {
             game->is_chain_capture = true;
             game->chain_piece_pos = to;
-            // Tura się NIE zmienia
             return true;
         }
     } else {
-        // Zwykły ruch - sprawdź promocję
+        // check if krolowka
         if (p == WHITE_PIECE && to.y == 0) game->board[to.y][to.x] = WHITE_KING;
         if (p == BLACK_PIECE && to.y == 7) game->board[to.y][to.x] = BLACK_KING;
     }
 
-    // Koniec tury
+    // koniec tury
     game->is_chain_capture = false;
     game->chain_piece_pos.x = -1;
     game->moves_count++;
@@ -268,7 +261,7 @@ void check_win_condition(GameState *game) {
         game->game_over = true;
         game->end_time = time(NULL);
     } else if (game->black_pieces <= 0) {
-        game->winner = 1; // Białe
+        game->winner = 1; // whte
         game->game_over = true;
         game->end_time = time(NULL);
     }
