@@ -41,6 +41,10 @@ typedef struct {
     time_t start_time;
     time_t end_time;
     GameMode mode;
+
+    // Pola do obsługi wielokrotnego bicia
+    bool is_chain_capture;
+    Position chain_piece_pos; // Pozycja pionka, który musi kontynuować bicie
 } GameState;
 
 #endif // COMMON_H

@@ -25,6 +25,7 @@ void close_ui();
 int show_start_menu();
 int show_pause_menu();
 void show_end_screen(GameState *game);
+void show_stats_screen();
 void draw_game_screen(GameState *game, Position cursor, Position selected, bool is_selected);
 
 #endif // UI_H

@@ -8,6 +8,7 @@
 #include "game_logic.h"
 #include "ui.h"
 #include "bot.h"
+#include "stats.h"
 
 // Deklaracja zmiennej globalnej ncurses
 extern int ESCDELAY;
@@ -20,6 +21,7 @@ void handle_signal(int sig) {
 }
 
 void print_final_stats(GameState *game) {
+    save_game_stats(game);
     show_end_screen(game);
 }
 
@@ -43,6 +45,11 @@ int main(int argc, char *argv[]) {
         if (menu_choice == -1) {
             stop_flag = 1;
             break; // Wyjście z programu
+        }
+
+        if (menu_choice == 2) {
+            show_stats_screen();
+            continue;
         }
 
         GameState game;

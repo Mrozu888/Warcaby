@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "stats.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -57,9 +58,10 @@ int show_start_menu() {
     const char *options[] = {
         "Gra z kolega (PvP)",
         "Gra z Botem (PvE)",
+        "Statystyki",
         "Wyjscie"
     };
-    int n_options = 3;
+    int n_options = 4;
 
     while(1) {
         clear();
@@ -77,7 +79,7 @@ int show_start_menu() {
             }
         }
 
-        center_print(20, "Uzyj strzalek gora/dol i zatwierdz ENTER");
+        center_print(22, "Uzyj strzalek gora/dol i zatwierdz ENTER");
 
         int ch = getch();
         switch(ch) {
@@ -91,9 +93,55 @@ int show_start_menu() {
                 break;
             case 10: // Enter
             case 13: // Enter (czasem 13)
-                if (choice == 2) return -1; // Wyjście
-                return choice; // 0 lub 1
+                if (choice == 3) return -1; // Wyjście
+                return choice; // 0, 1, 2
         }
+    }
+}
+
+void show_stats_screen() {
+    GameRecord records[MAX_RECORDS];
+    int count = load_game_stats(records, MAX_RECORDS);
+
+    int page = 0;
+    int per_page = 10;
+    int max_pages = (count > 0) ? (count + per_page - 1) / per_page : 1;
+
+    while(1) {
+        clear();
+        attron(A_BOLD);
+        center_print(2, "HISTORIA GIER");
+        attroff(A_BOLD);
+
+        mvprintw(4, 5, "%-20s %-10s %-10s %-10s", "DATA", "ZWYCIEZCA", "RUCHY", "CZAS(s)");
+        mvhline(5, 5, ACS_HLINE, 60);
+
+        if (count == 0) {
+            center_print(10, "Brak zapisanych gier.");
+        } else {
+            int start = page * per_page;
+            int end = start + per_page;
+            if (end > count) end = count;
+
+            for (int i = start; i < end; i++) {
+                // Odwracamy kolejność wyświetlania (najnowsze na górze)
+                // Ale w pliku dopisujemy na koniec, więc najnowsze są na końcu.
+                // Żeby wyświetlić najnowsze na górze, musimy czytać od tyłu: count - 1 - i
+                int idx = count - 1 - i;
+
+                mvprintw(6 + (i - start), 5, "%-20s %-10s %-10d %-10d",
+                         records[idx].date, records[idx].winner, records[idx].moves, records[idx].duration);
+            }
+        }
+
+        char footer[64];
+        sprintf(footer, "Strona %d/%d | Strzalki: Przewijanie | Q/ESC: Powrot", page + 1, max_pages);
+        center_print(20, footer);
+
+        int ch = getch();
+        if (ch == 'q' || ch == 27) break;
+        if (ch == KEY_LEFT && page > 0) page--;
+        if (ch == KEY_RIGHT && page < max_pages - 1) page++;
     }
 }
 
