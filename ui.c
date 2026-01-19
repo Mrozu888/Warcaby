@@ -66,7 +66,7 @@ int show_start_menu() {
     while(1) {
         clear();
         attron(COLOR_PAIR(CP_TEXT) | A_BOLD);
-        center_print(5, "=== PROJEKT WARCABY (POSIX) ===");
+        center_print(5, "=== PROJEKT WARCABY ===");
         attroff(COLOR_PAIR(CP_TEXT) | A_BOLD);
 
         for(int i = 0; i < n_options; i++) {

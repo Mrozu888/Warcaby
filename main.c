@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
                 case KEY_DOWN:  if (cursor.y < BOARD_SIZE - 1) cursor.y++; break;
                 case KEY_LEFT:  if (cursor.x > 0) cursor.x--; break;
                 case KEY_RIGHT: if (cursor.x < BOARD_SIZE - 1) cursor.x++; break;
-                case ' ': // Spacja
+                case ' ': // Space
                 case '\n': // Enter
                 case KEY_ENTER:
                     if (!is_selected) {
@@ -132,7 +132,6 @@ int main(int argc, char *argv[]) {
     }
 
     close_ui();
-    printf("Aplikacja zakonczona.\n");
 
     return 0;
 }

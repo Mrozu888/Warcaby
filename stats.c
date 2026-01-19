@@ -6,6 +6,7 @@
 
 #define STATS_FILE "stats.txt"
 
+// zapisanie statystyk skonczonej gry
 void save_game_stats(GameState *game) {
     FILE *fp = fopen(STATS_FILE, "a");
     if (!fp) return;
@@ -18,10 +19,13 @@ void save_game_stats(GameState *game) {
     const char *winner_str = (game->winner == 1) ? "BIALY" : (game->winner == 2 ? "CZARNY" : "REMIS");
     int duration = (int)difftime(game->end_time, game->start_time);
 
+    // zapisanie do pliku informacji o dacie, zwyciezcy, ilosci ruchow oraz czasie gry
     fprintf(fp, "%s;%s;%d;%d\n", date_str, winner_str, game->moves_count, duration);
     fclose(fp);
 }
 
+
+// wczytanie statystyk z pliku
 int load_game_stats(GameRecord *records, int max_records) {
     FILE *fp = fopen(STATS_FILE, "r");
     if (!fp) return 0;
@@ -43,7 +47,7 @@ int load_game_stats(GameRecord *records, int max_records) {
 
         token = strtok(NULL, ";");
         if (!token) continue;
-        records[count].moves = atoi(token);
+        records[count].moves = atoi(token); // zamiana ascii na int
 
         token = strtok(NULL, ";");
         if (!token) continue;

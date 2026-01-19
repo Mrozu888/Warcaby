@@ -59,7 +59,7 @@ bool is_own(GameState *game, PieceType p) {
     else return (p == BLACK_PIECE || p == BLACK_KING);
 }
 
-// Sprawdza czy pionek na danej pozycji może wykonać bicie
+// sprawdzenie czy jest wrog po przekatnej
 bool can_pawn_capture(GameState *game, Position pos) {
     int dirs[4][2] = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
     for (int i = 0; i < 4; i++) {
@@ -79,7 +79,7 @@ bool can_pawn_capture(GameState *game, Position pos) {
     return false;
 }
 
-// Sprawdza czy damka na danej pozycji może wykonać bicie
+// sprawdzenie czy jest wrog po przekatnej (damka)
 bool can_king_capture(GameState *game, Position pos) {
     int dirs[4][2] = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
     for (int i = 0; i < 4; i++) {
@@ -107,6 +107,7 @@ bool can_king_capture(GameState *game, Position pos) {
     return false;
 }
 
+// sprawdzenie pionka
 bool can_piece_capture(GameState *game, Position pos) {
     PieceType p = game->board[pos.y][pos.x];
     if (p == WHITE_PIECE || p == BLACK_PIECE) return can_pawn_capture(game, pos);
@@ -114,6 +115,7 @@ bool can_piece_capture(GameState *game, Position pos) {
     return false;
 }
 
+// sprawdzenie czy gracz ma mozliwosc wykonania bicia
 bool player_has_capture(GameState *game) {
     for (int y = 0; y < BOARD_SIZE; y++) {
         for (int x = 0; x < BOARD_SIZE; x++) {
@@ -126,6 +128,7 @@ bool player_has_capture(GameState *game) {
     return false;
 }
 
+// glowna funckja sprawdzajaca moziwosc wykonania ruchu
 bool attempt_move(GameState *game, Position from, Position to) {
     if (!is_valid_pos(from) || !is_valid_pos(to)) return false;
 
@@ -155,7 +158,7 @@ bool attempt_move(GameState *game, Position from, Position to) {
     if (p == WHITE_PIECE || p == BLACK_PIECE) {
 
         if (adx == 1) {
-            if (capture_available) return false; // Wymuszenie bicia
+            if (capture_available) return false; // wymuszenie bicia
             // tylko do przodu
             if (p == WHITE_PIECE && dy > 0) return false;
             if (p == BLACK_PIECE && dy < 0) return false;
@@ -184,7 +187,7 @@ bool attempt_move(GameState *game, Position from, Position to) {
             return false; // pionek nie moze dalej niz 2 pola
         }
     }
-    // Logika dla krolowki
+    // Logika dla damki
     else {
         int stepX = sign(dx);
         int stepY = sign(dy);
@@ -194,9 +197,9 @@ bool attempt_move(GameState *game, Position from, Position to) {
 
         while (x != to.x) {
             if (game->board[y][x] != EMPTY) {
-                if (is_own(game, game->board[y][x])) return false; // Blokada przez swojego
+                if (is_own(game, game->board[y][x])) return false; // blokada przez swojego pionka
                 if (is_enemy(game, game->board[y][x])) {
-                    if (enemy_count > 0) return false; // Nie można przeskoczyć dwóch
+                    if (enemy_count > 0) return false; // nie mozna przeskoczyc 2
                     enemy_count++;
                     captured_pos.x = x;
                     captured_pos.y = y;
@@ -207,7 +210,7 @@ bool attempt_move(GameState *game, Position from, Position to) {
         }
 
         if (enemy_count == 0){
-            if (capture_available) return false; // Wymuszenie bicia
+            if (capture_available) return false; // wymuszenie bicia
             game->board[to.y][to.x] = p;
             game->board[from.y][from.x] = EMPTY;
         } else {

@@ -8,9 +8,7 @@ bool is_in_bounds(int x, int y) {
 }
 
 void make_bot_move(GameState *game) {
-    // Ulepszony bot: przegląda wszystkie możliwe ruchy zamiast losować
-
-    // 1. Jeśli trwa seria bić, musimy ruszyć konkretnym pionkiem
+    // szukanie bicia wielokrotnego (zrobienie kolejnego bicia)
     if (game->is_chain_capture) {
         Position from = game->chain_piece_pos;
         // Sprawdź wszystkie możliwe bicia dla tego pionka
@@ -24,7 +22,7 @@ void make_bot_move(GameState *game) {
                 }
             }
         }
-        // Jeśli to damka, spróbujmy szerszego zakresu
+        // dla damki
         if (game->board[from.y][from.x] == BLACK_KING) {
              for (int dist = 2; dist < BOARD_SIZE; dist++) {
                  int dirs[4][2] = {{-1,-1}, {1,-1}, {-1,1}, {1,1}};
@@ -36,13 +34,12 @@ void make_bot_move(GameState *game) {
                  }
              }
         }
-        // Awaryjne wyjście z chain capture
         game->is_chain_capture = false;
         game->current_turn = PLAYER_WHITE;
         return;
     }
 
-    // 2. Szukamy jakiegokolwiek ruchu
+    // szukanie ruchu
     Position my_pieces[BOARD_SIZE * BOARD_SIZE / 2];
     int count = 0;
 
@@ -55,7 +52,7 @@ void make_bot_move(GameState *game) {
         }
     }
 
-    // Mieszamy kolejność
+    // losowanie ruchu bota
     for (int i = 0; i < count; i++) {
         int r = rand() % count;
         Position temp = my_pieces[i];
@@ -63,7 +60,7 @@ void make_bot_move(GameState *game) {
         my_pieces[r] = temp;
     }
 
-    // Próbujemy wykonać ruch każdym pionkiem
+    // wykonanie ruchu przez boota
     for (int i = 0; i < count; i++) {
         Position from = my_pieces[i];
         PieceType p = game->board[from.y][from.x];
@@ -71,7 +68,7 @@ void make_bot_move(GameState *game) {
         int max_dist = (p == BLACK_KING) ? BOARD_SIZE : 3;
         int dirs[4][2] = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
 
-        // Najpierw szukamy bić (dystans >= 2)
+        // szukanie bic
         for (int dist = 2; dist < max_dist; dist++) {
             for (int d = 0; d < 4; d++) {
                 Position to = {from.x + dirs[d][0] * dist, from.y + dirs[d][1] * dist};
@@ -81,7 +78,7 @@ void make_bot_move(GameState *game) {
             }
         }
 
-        // Jeśli nie ma bić, szukamy zwykłych ruchów
+        // brak bic
         for (int dist = 1; dist < max_dist; dist++) {
              for (int d = 0; d < 4; d++) {
                 Position to = {from.x + dirs[d][0] * dist, from.y + dirs[d][1] * dist};
