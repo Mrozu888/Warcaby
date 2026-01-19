@@ -1,26 +1,32 @@
 # Projekt Warcaby (POSIX)
 
 ## Opis
-Projekt jest implementacją klasycznej gry w Warcaby w języku C, przeznaczoną do uruchamiania w terminalu systemów zgodnych z POSIX (UNIX). Interfejs graficzny został zrealizowany przy użyciu biblioteki `ncurses`, co zapewnia czytelną i responsywną rozgrywkę w terminalu.
+Projekt jest implementacją klasycznej gry w Warcaby w języku C, przeznaczoną do uruchamiania w terminalu systemów zgodnych z POSIX (Linux, macOS). Interfejs graficzny został zrealizowany przy użyciu biblioteki `ncurses`, co zapewnia czytelną i responsywną rozgrywkę w trybie tekstowym.
 
-Gra oferuje możliwość rywalizacji z drugim graczem lub z komputerem (Bot).
+Gra oferuje możliwość rywalizacji z drugim graczem (tryb "gorące krzesło") lub z komputerem (Bot).
 
 ## Funkcjonalności
 - **Tryby gry**:
   - Gracz vs Gracz (PvP).
-  - Gracz vs Bot.
-- **Zaawansowana logika gry w warcaby**:
-  - Obsługa Królówek – ruch o dowolną liczbę pól.
-  - Wymuszenie bicia.
-  - Bicie wielokrotne.
+  - Gracz vs Bot (PvE).
+- **Zaawansowana logika gry**:
+  - Obsługa "Damek" (Królówek) – ruch o dowolną liczbę pól.
+  - Wymuszenie bicia (jeśli bicie jest możliwe, gracz musi je wykonać).
+  - Bicie wielokrotne (seria bić).
   - Bicie do tyłu dla zwykłych pionków.
 - **Statystyki**:
   - Automatyczny zapis wyników gier do pliku `stats.txt`.
   - Przeglądarka historii gier w menu głównym (Data, Zwycięzca, Liczba ruchów, Czas).
 - **Interfejs**:
   - Kolorowa plansza (zależna od ustawień terminala).
+  - Obsługa myszy (wspierana przez niektóre terminale) i klawiatury.
   - Menu pauzy.
-  - Przegląd statystyk.
+
+## Wykorzystane elementy POSIX
+Projekt wykorzystuje mechanizmy programowania systemowego zgodne ze standardem POSIX:
+1. **Obsługa sygnałów (`sigaction`)**: Bezpieczne przechwytywanie sygnałów `SIGINT` (Ctrl+C) i `SIGTERM` w celu poprawnego zamknięcia interfejsu `ncurses` i zwolnienia zasobów.
+2. **Sterowanie czasem (`usleep`)**: Funkcja z `<unistd.h>` używana do wstrzymywania procesu (symulacja czasu namysłu bota), co poprawia płynność rozgrywki.
+3. **Zmienne środowiskowe (`setenv`)**: Dynamiczna konfiguracja zmiennej `ESCDELAY` w celu zapewnienia natychmiastowej reakcji na klawisz `ESC`.
 
 ## Wymagania
 Aby skompilować i uruchomić projekt, potrzebujesz:
